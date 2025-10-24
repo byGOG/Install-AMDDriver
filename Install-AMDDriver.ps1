@@ -109,8 +109,9 @@ try {
             WindowStyle = 'Hidden'
             Wait      = $true
         }
-        Start-Process @psi
-        exit $LASTEXITCODE
+        $proc = Start-Process @psi -PassThru
+        $proc.WaitForExit()
+        exit $proc.ExitCode
     }
 
     # En yaygın AMD kurulum seçenekleri. Kullanıcı gerekirse -SilentArgs ile geçersiz kılabilir.
