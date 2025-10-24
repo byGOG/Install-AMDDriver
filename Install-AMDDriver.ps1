@@ -53,7 +53,7 @@ function Test-FileIsExe([string]$Path){
     } finally { $fs.Dispose() }
 }
 
-function Download-AmdInstaller([string]$Url,[string]$OutDir){
+function Save-AmdInstaller([string]$Url,[string]$OutDir){
     if(-not (Test-Path -LiteralPath $OutDir)){ New-Item -ItemType Directory -Path $OutDir | Out-Null }
     $fileName = Split-Path $Url -Leaf
     $outPath  = Join-Path $OutDir $fileName
@@ -68,7 +68,7 @@ function Download-AmdInstaller([string]$Url,[string]$OutDir){
     return $outPath
 }
 
-function Assert-Signature([string]$Path){
+function Test-FileSignature([string]$Path){
     $sig = Get-AuthenticodeSignature -FilePath $Path
     if($sig.Status -ne 'Valid'){
         if($Force){ Write-Warn "İmza durumu: $($sig.Status). -Force ile devam ediliyor." }
@@ -78,10 +78,10 @@ function Assert-Signature([string]$Path){
     }
 }
 
-function Start-SilentInstall([string]$Exe,[string]$Args){
+function Start-SilentInstall([string]$Exe,[string]$ArgumentList){
     Write-Info "Sessiz kurulum başlatılıyor..."
-    Write-Info "Komut: `"$Exe`" $Args"
-    $p = Start-Process -FilePath $Exe -ArgumentList $Args -Verb RunAs -PassThru -Wait -WindowStyle Hidden
+    Write-Info "Komut: `"$Exe`" $ArgumentList"
+    $p = Start-Process -FilePath $Exe -ArgumentList $ArgumentList -Verb RunAs -PassThru -Wait -WindowStyle Hidden
     Write-Info "Kurulum çıkış kodu: $($p.ExitCode)"
     return $p.ExitCode
 }
@@ -90,8 +90,8 @@ try {
     $url = if([string]::IsNullOrWhiteSpace($Url)) { Get-LatestAmdMinimalSetupUrl } else { $Url }
     Write-Info "Bulunan sürüm: $url"
 
-    $downloadPath = Download-AmdInstaller -Url $url -OutDir $DownloadDirectory
-    Assert-Signature -Path $downloadPath
+    $downloadPath = Save-AmdInstaller -Url $url -OutDir $DownloadDirectory
+    Test-FileSignature -Path $downloadPath
 
     if($DownloadOnly){
         Write-Info 'Yalnızca indirme istendi (-DownloadOnly). Kurulum yapılmadı.'
@@ -114,7 +114,7 @@ try {
     }
 
     # En yaygın AMD kurulum seçenekleri. Kullanıcı gerekirse -SilentArgs ile geçersiz kılabilir.
-    $exit = Start-SilentInstall -Exe $downloadPath -Args $SilentArgs
+    $exit = Start-SilentInstall -Exe $downloadPath -ArgumentList $SilentArgs
     if($exit -ne 0){
         Write-Warn "Çıkış kodu $exit. Alternatif sessiz parametreler deneniyor..."
         $fallbackArgs = @(
@@ -126,7 +126,7 @@ try {
         )
         foreach($fa in $fallbackArgs){
             Write-Info "Deneniyor: $fa"
-            $exit = Start-SilentInstall -Exe $downloadPath -Args $fa
+            $exit = Start-SilentInstall -Exe $downloadPath -ArgumentList $fa
             if($exit -eq 0){ break }
         }
     }
