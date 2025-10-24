@@ -2,7 +2,7 @@
 param(
     [switch]$DownloadOnly,
     [string]$DownloadDirectory = $env:TEMP,
-    [string]$SilentArgs = '-install -quiet -norestart',
+    [string]$SilentArgs = '-ui',
     [string]$Url,
     [switch]$Force,              # skip signature check
     [int]$WebTimeoutSec = 120
@@ -117,6 +117,10 @@ try {
     # En yaygın AMD kurulum seçenekleri. Kullanıcı gerekirse -SilentArgs ile geçersiz kılabilir.
     $exit = Start-SilentInstall -Exe $downloadPath -ArgumentList $SilentArgs
     if($exit -ne 0){
+        Write-Err "Kurulum başarısız (-ui). Çıkış kodu: $exit"
+        exit $exit
+    }
+    if($exit -ne 0){
         Write-Warn "Çıkış kodu $exit. Alternatif sessiz parametreler deneniyor..."
         $fallbackArgs = @(
             '/INSTALL /QUIET /NORESTART',
@@ -139,3 +143,4 @@ catch {
     Write-Err $_
     exit 1
 }
+

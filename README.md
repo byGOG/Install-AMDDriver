@@ -12,7 +12,7 @@ Set-ExecutionPolicy -Scope Process Bypass -Force; $u='https://raw.githubusercont
 
 - Bu komut, betiği geçici klasöre indirir ve çalıştırır.
 - Betik, AMD’nin “rn-rad-win-latest” sayfasındaki en güncel “minimalsetup” web yükleyicisini bulur, indirir ve imza doğrulaması yapar.
-- Ardından sessiz kurulum başlatılır. Gerekirse kurulum aşamasında yönetici (UAC) yükseltmesi yapılır.
+- Ardından yalnızca “-ui” parametresi ile sessiz kurulum başlatılır. Gerekirse kurulum aşamasında yönetici (UAC) yükseltmesi yapılır.
 
 ## Betik Dosyası
 
@@ -26,8 +26,8 @@ Set-ExecutionPolicy -Scope Process Bypass -Force; $u='https://raw.githubusercont
   - `./Install-AMDDriver.ps1 -DownloadOnly -DownloadDirectory C:\AMD\Pkg`
 - Belirli bir URL ile çalıştırmak (ör. belirli sürüm):
   - `./Install-AMDDriver.ps1 -Url 'https://drivers.amd.com/drivers/installer/25.10/whql/amd-software-adrenalin-edition-25.9.1-minimalsetup-250901_web.exe'`
-- Sessiz kurulum parametrelerini değiştirmek:
-  - `./Install-AMDDriver.ps1 -SilentArgs '/INSTALL /QUIET /NORESTART'`
+- Sessiz kurulum parametresini değiştirmek (varsayılan: `-ui`):
+  - `./Install-AMDDriver.ps1 -SilentArgs '-ui'`
 - İmza doğrulaması başarısızsa ve bilerek devam etmek isterseniz:
   - `./Install-AMDDriver.ps1 -Force`
 
@@ -35,7 +35,7 @@ Set-ExecutionPolicy -Scope Process Bypass -Force; $u='https://raw.githubusercont
 
 - “rn-rad-win-latest” sürüm notu sayfasından “minimalsetup” web yükleyici bağlantısı çıkarılır.
 - Dosya indirildikten sonra “MZ” (EXE) kontrolü ve Authenticode imzası doğrulanır.
-- Varsayılan sessiz argümanlar `-install -quiet -norestart` kullanılır; başarısız olursa yaygın alternatifler denenir.
+- Varsayılan sessiz argüman yalnızca `-ui`’dir. `-ui` ile kurulum başarısız olursa betik hata ile çıkar; alternatif anahtar denemesi yapılmaz.
 
 ## Gereksinimler
 
@@ -48,4 +48,3 @@ Set-ExecutionPolicy -Scope Process Bypass -Force; $u='https://raw.githubusercont
 
 - Konsolda Türkçe karakter sorunu yaşarsanız: `chcp 65001` komutunu çalıştırın veya PowerShell 7 kullanın.
 - AMD web sayfa yapısı değişirse dinamik tespit başarısız olabilir; bu durumda `-Url` parametresiyle doğrudan indirme bağlantısı verin.
-
