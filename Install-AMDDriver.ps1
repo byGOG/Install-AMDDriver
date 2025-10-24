@@ -2,7 +2,7 @@
 param(
     [switch]$DownloadOnly,
     [string]$DownloadDirectory = $env:TEMP,
-    [string]$SilentArgs = '-install -quiet -norestart',
+    [string]$SilentArgs = '-install -norestart',
     [string]$Url,
     [switch]$Force,              # skip signature check
     [int]$WebTimeoutSec = 120
@@ -118,11 +118,11 @@ try {
     if($exit -ne 0){
         Write-Warn "Çıkış kodu $exit. Alternatif sessiz parametreler deneniyor..."
         $fallbackArgs = @(
-            '/INSTALL /QUIET /NORESTART',
+            '/INSTALL /NORESTART',
             '/SILENT /NORESTART',
             '/S',
             '/VERYSILENT',
-            '-install -silent -norestart'
+            '-install -norestart'
         )
         foreach($fa in $fallbackArgs){
             Write-Info "Deneniyor: $fa"
